@@ -1,20 +1,21 @@
 <div align="center">
+  <img src="./dashboard/logo.jpeg" alt="WAGOAT BOT Logo" width="300"/>
   <h1>🐐 WAGoat-Bot</h1>
   <p><b>A powerful, event-driven WhatsApp bot built on <code>@whiskeysockets/baileys</code> with a comprehensive FCA-compatible API layer.</b></p>
 
- 
-  
-  [![Pair 1](https://img.shields.io/badge/Pair_1-FF4500?style=for-the-badge&logo=render&logoColor=white)](https://romeobot-paircode.onrender.com/)
-  [![Pair 2](https://img.shields.io/badge/Pair_2-8A2BE2?style=for-the-badge&logo=render&logoColor=white)](https://prime-pair-web-0rst.onrender.com/pair2)
   [![GitHub](https://img.shields.io/badge/GitHub-WAGOAT--BOT-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/efkidgamerdev/WAGOAT-BOT)
-  [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+  [![Node.js](https://img.shields.io/badge/Node.js-v18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
   [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+  [![Code Size](https://img.shields.io/github/languages/code-size/efkidgamerdev/WAGOAT-BOT?style=for-the-badge&logo=github&color=blueviolet&logoColor=white)](https://github.com/efkidgamerdev/WAGOAT-BOT)
+  [![Visitors](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fefkidgamerdev%2FWAGOAT-BOT&count_bg=%2379C83D&title_bg=%23555555&icon=github.svg&icon_color=%23E7E7E7&title=visitors&edge_flat=false)](https://github.com/efkidgamerdev/WAGOAT-BOT)
 </div>
+
 
 <br/>
  <div align="center">
     <img src="https://readme-typing-svg.demolab.com?font=Transformers&size=80&pause=1000&color=0000FF&center=true&width=1000&height=150&lines=WAGOAT-BOT" alt="Typing SVG - WAGOAT-BOT" />
 </div>
+
   
 ## 📖 Table of Contents
 - [Features](#features)
