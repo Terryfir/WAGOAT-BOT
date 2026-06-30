@@ -29,7 +29,7 @@ module.exports = {
 			onlyAdmin: "Only admin can change prefix of system bot",
 			successGlobal: "Changed prefix of system bot to: %1",
 			successThisThread: "Changed prefix in your box chat to: %1",
-			myPrefix: "Hey, 𝙍𝙤𝙢𝙚𝙤𖣘𝘽𝙤𝙩࿐ speaking!🔥\n⚙ 𝗦𝘆𝘀𝘁𝗲𝗺 𝗣𝗿𝗲𝗳𝗶𝘅:- *%1*\n🛸 𝗕𝗼𝘅 𝗖𝗵𝗮𝘁 𝗣𝗿𝗲𝗳𝗶𝘅:- *%2*"
+			myPrefix: "Hey, Terry speaking!🔥\n⚙ 𝗦𝘆𝘀𝘁𝗲𝗺 𝗣𝗿𝗲𝗳𝗶𝘅:- *%1*\n🛸 𝗕𝗼𝘅 𝗖𝗵𝗮𝘁 𝗣𝗿𝗲𝗳𝗶𝘅:- *%2*"
 		}
 	},
 
