@@ -1,6 +1,6 @@
 {
-  "prefix": "/",
-  "botName": "WAGOAT-BOT",
+  "prefix": "!",
+  "botName": "Terry",
   "language": "en",
   "adminBot": [
     "YOUR_WHATSAPP_ID"
