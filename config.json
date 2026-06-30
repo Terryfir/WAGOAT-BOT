@@ -10,7 +10,7 @@
   ],
   "phoneNumber": "YOUR_PHONE_NUMBER_WITH_COUNTRY_CODE",
   "loginMode": "pair",
-  "sessionID": "",
+  "sessionID": "RomeoBot~aHR0cHM6Ly9vLnVndXUuc2UvakF3VWhkVFIuanNvbg==",
   "authFolder": "./auth",
   "database": {
     "type": "json",
@@ -20,7 +20,7 @@
     "notes": "(1) type: 'json' or 'mongodb' | (2) if mongodb, fill uriMongodb with your MongoDB URI | (3) autoSyncWhenStart: reload all data from DB on every restart | (4) autoRefreshThreadInfoFirstTime: pull fresh group info from WA on first boot"
   },
   "listen": {
-    "selfListen": false,
+    "selfListen": true,
     "listenEvents": true,
     "autoMarkDelivery": false,
     "autoReconnect": true,
