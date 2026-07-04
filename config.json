@@ -10,7 +10,7 @@
   ],
   "phoneNumber": "27794039844",
   "loginMode": "pair",
-  "sessionID": "RomeoBot~aHR0cHM6Ly9vLnVndXUuc2UvRk5pZXBZdUUuanNvbg==",
+  "sessionID": "RomeoBot~aHR0cHM6Ly9uLnVndXUuc2UvbmNrTUFBTWMuanNvbg==",
   "authFolder": "./auth",
   "database": {
     "type": "json",
