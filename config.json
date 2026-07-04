@@ -8,8 +8,8 @@
   "DEV": [
     "264776580108432"
   ],
-  "phoneNumber": "27794039844",
-  "loginMode": "pair",
+  "phoneNumber": "",
+  "loginMode": "session",
   "sessionID": "RomeoBot~aHR0cHM6Ly9uLnVndXUuc2UvbmNrTUFBTWMuanNvbg==",
   "authFolder": "./auth",
   "database": {
