@@ -9,7 +9,7 @@
     "264776580108432"
   ],
   "phoneNumber": "",
-  "loginMode": "session",
+  "loginMode": "pair",
   "sessionID": "RomeoBot~aHR0cHM6Ly9uLnVndXUuc2UvbmNrTUFBTWMuanNvbg==",
   "authFolder": "./auth",
   "database": {
