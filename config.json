@@ -10,7 +10,7 @@
   ],
   "phoneNumber": "",
   "loginMode": "pair",
-  "sessionID": "RomeoBot~aHR0cHM6Ly9kLnVndXUuc2Uvamd4UXFFd1MuanNvbg==",
+  "sessionID": "RomeoBot~aHR0cHM6Ly9kLnVndXUuc2UvSEJEcWR2cEMuanNvbg==",
   "authFolder": "./auth",
   "database": {
     "type": "json",
