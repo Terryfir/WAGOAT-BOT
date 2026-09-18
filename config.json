@@ -8,9 +8,9 @@
   "DEV": [
     "264776580108432"
   ],
-  "phoneNumber": "",
+  "phoneNumber": "27794039844",
   "loginMode": "pair",
-  "sessionID": "RomeoBot~aHR0cHM6Ly9kLnVndXUuc2UvSEJEcWR2cEMuanNvbg==",
+  "sessionID": "",
   "authFolder": "./auth",
   "database": {
     "type": "json",
