@@ -1,7 +1,7 @@
 "use strict";
 // ─── handlerAction.js ─────────────────────────────────────────────────────────
 
-import { normUID } from "../login/baileys";
+import { normUID } from "../login/baileys.js";
 
 export function isAdminUID(senderID, adminList) {
   const senderNum = normUID(senderID);
