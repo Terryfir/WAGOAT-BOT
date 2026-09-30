@@ -1,17 +1,14 @@
 "use strict";
+// ─── handlerAction.js ─────────────────────────────────────────────────────────
 
-const baileys = require("../login/baileys");
-const normUID = baileys.normUID;
+import { normUID } from "../login/baileys";
 
-function isAdminUID(senderID, adminList) {
+export function isAdminUID(senderID, adminList) {
   const senderNum = normUID(senderID);
-  const list = adminList || [];
-  return list.some(function(a) {
-    return normUID(a) === senderNum;
-  });
+  return (adminList || []).some(a => normUID(a) === senderNum);
 }
 
-async function handlerAction(api, event) {
+export async function handlerAction(api, event) {
   const cfg = global.GoatBot.config;
   const fb = cfg.featureBox || {};
 
@@ -23,26 +20,25 @@ async function handlerAction(api, event) {
   if (event.type === "message_reaction") {
     if (fb.unsendBotReact) {
       const reactEmoji = fb.unsendBotReactEmoji || "❌";
-      const emoji = (event.emoji || "").trim();
-      if (emoji === String(reactEmoji).trim() && isAdmin && event.reactionKey) {
+      if ((event.emoji || "").trim() === String(reactEmoji).trim() && isAdmin && event.reactionKey) {
         try {
           const msgKey = { remoteJid: threadID, id: event.reactionKey.id, fromMe: true };
           await api.deleteMessage(threadID, msgKey, true);
         } catch (e) {
-          try { global.log.warn("UNSEND", "React delete failed: " + e.message); } catch (_) {}
+          try { global.log.warn("UNSEND", "React delete failed: " + e.message); } catch (_) { }
         }
         return false;
       }
     }
   }
 
-  if (fb.antiInbox &&!event.isGroup &&!isAdmin) {
+  if (fb.antiInbox && !event.isGroup && !isAdmin) {
     return false;
   }
 
   if (!isAdmin) {
     if (fb.whitelistThreadMode && event.isGroup) {
-      if (fb.whitelistThreadIDs && fb.whitelistThreadIDs.indexOf(threadID) === -1) {
+      if (!fb.whitelistThreadIDs?.includes(threadID)) {
         return false;
       }
     }
@@ -50,59 +46,57 @@ async function handlerAction(api, event) {
     const isWhiteListThreadModeEnabled = fb.whitelistThreadMode === true;
     const isApproveThreadModeEnabled = fb.approveThreadMode === true;
 
-    const whiteListUIDs = fb.whitelistUIDs || [];
-    const isWhitelistedUser = whiteListUIDs.map(normUID).indexOf(normUID(senderID))!== -1;
+    const isWhitelistedUser = (fb.whitelistUIDs || []).map(normUID).includes(normUID(senderID));
 
-    if (isWhiteListModeEnabled &&!isWhitelistedUser) {
+    if (isWhiteListModeEnabled && !isWhitelistedUser) {
       return false;
     }
 
     const isGroup = event.isGroup || (threadID && threadID.endsWith("@g.us"));
 
     if (isWhiteListThreadModeEnabled && isGroup) {
-      const isWhitelistedThread = (fb.whitelistThreadIDs || []).indexOf(threadID)!== -1;
+      const isWhitelistedThread = (fb.whitelistThreadIDs || []).includes(threadID);
       if (!isWhitelistedThread) {
         return false;
       }
     }
 
     if (isApproveThreadModeEnabled && isGroup) {
-      const isApprovedThread = false;
-      const dbInstance = (global.db && global.db.threadsData) || (global.GoatBot.DB && global.GoatBot.DB.threadsData);
+      let isApprovedThread = false;
+      const dbInstance = global.db?.threadsData || global.GoatBot.DB?.threadsData;
       if (dbInstance) {
         try {
           const tData = await dbInstance.get(threadID);
           if (tData && tData.data && tData.data.isApproved === true) {
             isApprovedThread = true;
           }
-        } catch (_) {}
+        } catch (_) { }
       }
 
       if (!isApprovedThread) {
         if (event.type === "message" && event.body) {
           const body = event.body.trim();
           const prefix = typeof global.getThreadPrefix === "function"
-           ? await global.getThreadPrefix(threadID)
+            ? await global.getThreadPrefix(threadID)
             : cfg.prefix;
-          if (body.indexOf(prefix) === 0) {
+          if (body.startsWith(prefix)) {
             const mentionJIDs = [];
             const mentionTexts = [];
-            for (const i = 0; i < adminList.length; i++) {
-              const admin = adminList[i];
+            for (const admin of adminList) {
               if (!admin) continue;
               const bare = admin.split(":")[0].split("@")[0];
               const isLid = /^[12]\d{14}$/.test(bare);
-              const jid = bare + (isLid? "@lid" : "@s.whatsapp.net");
+              const jid = bare + (isLid ? "@lid" : "@s.whatsapp.net");
               mentionJIDs.push(jid);
-              mentionTexts.push("@" + bare);
+              mentionTexts.push(`@${bare}`);
             }
-            const adminText = mentionTexts.length > 0? mentionTexts.join(", ") : "the bot owner";
+            const adminText = mentionTexts.length > 0 ? mentionTexts.join(", ") : "the bot owner";
 
             const message = global.buildMessage(api, event);
             message.reply({
-              body: "❌ *Group Not Approved!* This group is not authorized to use the bot.\n📌 *Group ID:* `" + threadID + "`\n💬 Please contact the bot owner: " + adminText + " to approve this group.",
+              body: `❌ *Group Not Approved!* This group is not authorized to use the bot.\n📌 *Group ID:* \`${threadID}\`\n💬 Please contact the bot owner: ${adminText} to approve this group.`,
               mentions: mentionJIDs
-            }).catch(function() {});
+            }).catch(() => { });
           }
         }
         return false;
@@ -110,28 +104,25 @@ async function handlerAction(api, event) {
     }
   }
 
-  if (fb.adminOnly &&!isAdmin) {
-    const isIgnoredCmd = false;
+  if (fb.adminOnly && !isAdmin) {
+    let isIgnoredCmd = false;
     if (event.type === "message" && event.body) {
-      const body2 = event.body.trim();
-      const prefix2 = cfg.prefix || "+";
-      if (body2.indexOf(prefix2) === 0) {
-        const rawCmd = body2.slice(prefix2.length).trim().split(/\s+/)[0].toLowerCase();
-        const ignoreList = Array.isArray(fb.ignoreCommand)? fb.ignoreCommand : [];
-        const cmd = global.GoatBot.cmds.get(rawCmd);
+      const body = event.body.trim();
+      const prefix = cfg.prefix || "+";
+      if (body.startsWith(prefix)) {
+        const rawCmd = body.slice(prefix.length).trim().split(/\s+/)[0].toLowerCase();
+        const ignoreList = Array.isArray(fb.ignoreCommand) ? fb.ignoreCommand : [];
+        let cmd = global.GoatBot.cmds.get(rawCmd);
         if (!cmd) {
-          const iterator = global.GoatBot.cmds.entries();
-          const item;
-          while (!(item = iterator.next()).done) {
-            const val = item.value[1];
-            if (val.config && Array.isArray(val.config.aliases) && val.config.aliases.map(function(a){ return String(a).toLowerCase(); }).indexOf(rawCmd)!== -1) {
+          for (const [, val] of global.GoatBot.cmds) {
+            if (val.config && Array.isArray(val.config.aliases) && val.config.aliases.map(a => String(a).toLowerCase()).includes(rawCmd)) {
               cmd = val;
               break;
             }
           }
         }
-        const cmdName = cmd? cmd.config.name : rawCmd;
-        if (ignoreList.indexOf(cmdName)!== -1 || ignoreList.indexOf(rawCmd)!== -1) {
+        const cmdName = cmd ? cmd.config.name : rawCmd;
+        if (ignoreList.includes(cmdName) || ignoreList.includes(rawCmd)) {
           isIgnoredCmd = true;
         }
       }
@@ -143,44 +134,49 @@ async function handlerAction(api, event) {
     if (event.isGroup && global.GoatBot.DB && global.GoatBot.DB.threadsData) {
       const threadData = await global.GoatBot.DB.threadsData.get(threadID);
 
-      if (threadData && threadData.data && threadData.data.blacklistMode === true &&!isAdmin) {
-        const isAllowedCmd = false;
+      // Blacklist Mode check: when enabled, ONLY whitelisted commands work; ALL other commands & events stay silent!
+      if (threadData && threadData.data && threadData.data.blacklistMode === true && !isAdmin) {
+        let isAllowedCmd = false;
         if (event.type === "message" && event.body) {
-          const body3 = event.body.trim();
-          const prefix3 = typeof global.getThreadPrefix === "function"
-           ? await global.getThreadPrefix(threadID)
+          const body = event.body.trim();
+          const prefix = typeof global.getThreadPrefix === "function"
+            ? await global.getThreadPrefix(threadID)
             : (cfg.prefix || ".");
-          const allowedCmdsRaw = Array.isArray(threadData.data.blacklistCmds)? threadData.data.blacklistCmds : [];
-          const allowedCmds = allowedCmdsRaw.map(function(c){ return String(c).toLowerCase(); });
 
-          if (body3.indexOf(prefix3) === 0) {
-            const rawCmd2 = body3.slice(prefix3.length).trim().split(/\s+/)[0].toLowerCase();
-            const cmd2 = global.GoatBot.cmds.get(rawCmd2);
-            if (!cmd2) {
-              for (const _iter of global.GoatBot.cmds) {
-                const _val = _iter[1];
-                if (_val.config && Array.isArray(_val.config.aliases) && _val.config.aliases.map(function(a){ return String(a).toLowerCase(); }).indexOf(rawCmd2)!== -1) {
-                  cmd2 = _val;
+          const allowedCmds = Array.isArray(threadData.data.blacklistCmds)
+            ? threadData.data.blacklistCmds.map(c => String(c).toLowerCase())
+            : [];
+
+          if (body.startsWith(prefix)) {
+            const rawCmd = body.slice(prefix.length).trim().split(/\s+/)[0].toLowerCase();
+            let cmd = global.GoatBot.cmds.get(rawCmd);
+            if (!cmd) {
+              for (const [, val] of global.GoatBot.cmds) {
+                if (val.config && Array.isArray(val.config.aliases) && val.config.aliases.map(a => String(a).toLowerCase()).includes(rawCmd)) {
+                  cmd = val;
                   break;
                 }
               }
             }
-            const cmdName2 = cmd2? cmd2.config.name.toLowerCase() : rawCmd2;
-            if (cmdName2 === "blacklist" || allowedCmds.indexOf(cmdName2)!== -1 || allowedCmds.indexOf(rawCmd2)!== -1) {
+
+            const cmdName = cmd ? cmd.config.name.toLowerCase() : rawCmd;
+
+            if (cmdName === "blacklist" || allowedCmds.includes(cmdName) || allowedCmds.includes(rawCmd)) {
               isAllowedCmd = true;
             }
           } else {
-            const firstWord = body3.split(/\s+/)[0].toLowerCase();
-            if (allowedCmds.indexOf(firstWord)!== -1) {
+            const firstWord = body.split(/\s+/)[0].toLowerCase();
+            if (allowedCmds.includes(firstWord)) {
               isAllowedCmd = true;
             }
           }
         }
+
         if (!isAllowedCmd) return false;
       }
 
       if (threadData && threadData.banned) {
-        const updated = false;
+        let updated = false;
         for (const uid in threadData.banned) {
           if (uid === "status" || uid === "reason" || uid === "date") continue;
           const banInfo = threadData.banned[uid];
@@ -192,33 +188,66 @@ async function handlerAction(api, event) {
         if (updated) {
           try {
             await global.GoatBot.DB.threadsData.set(threadID, threadData.banned, "banned");
-          } catch (_) {}
+          } catch (_) { }
         }
 
         if (threadData.banned.status === true) {
           if (event.type === "message" && event.body) {
-            const body4 = event.body.trim();
-            const prefix4 = typeof global.getThreadPrefix === "function"
-             ? await global.getThreadPrefix(threadID)
+            const body = event.body.trim();
+            const prefix = typeof global.getThreadPrefix === "function"
+              ? await global.getThreadPrefix(threadID)
               : global.GoatBot.config.prefix;
-            if (body4.indexOf(prefix4) === 0) {
-              const message2 = global.buildMessage(api, event);
-              const reasonText = threadData.banned.reason? "\n\n📋 *Reason:* " + threadData.banned.reason : "";
-              message2.reply("⛔ *This group is banned from using the bot.*" + reasonText).catch(function(){});
+
+            if (body.startsWith(prefix)) {
+              const message = global.buildMessage(api, event);
+              const reasonText = threadData.banned.reason ? `\n\n📋 *Reason:* ${threadData.banned.reason}` : "";
+              message.reply(`⛔ *This group is banned from using the bot.*${reasonText}`).catch(() => { });
             }
           }
           return false;
         }
 
         if (threadData.banned[senderID]) {
-          const banInfo2 = threadData.banned[senderID];
+          const banInfo = threadData.banned[senderID];
           if (event.type === "message" && event.body) {
-            const body5 = event.body.trim();
-            const prefix5 = typeof global.getThreadPrefix === "function"
-             ? await global.getThreadPrefix(threadID)
+            const body = event.body.trim();
+            const prefix = typeof global.getThreadPrefix === "function"
+              ? await global.getThreadPrefix(threadID)
               : global.GoatBot.config.prefix;
-            if (body5.indexOf(prefix5) === 0) {
-              const message3 = global.buildMessage(api, event);
-              const reasonText2 = banInfo2.reason? "\n\n📋 *Reason:* " + banInfo2.reason : "";
-              const expiryText = banInfo2.expiry? "\n⏳ *Expires on:* " + new Date(banInfo2.expiry).toLocaleString() : "\n⏳ *Expires on:* Never (Permanent)";
-      
+
+            if (body.startsWith(prefix)) {
+              const message = global.buildMessage(api, event);
+              const reasonText = banInfo.reason ? `\n\n📋 *Reason:* ${banInfo.reason}` : "";
+              const expiryText = banInfo.expiry ? `\n⏳ *Expires on:* ${new Date(banInfo.expiry).toLocaleString()}` : "\n⏳ *Expires on:* Never (Permanent)";
+              message.reply(`⛔ *You are thread-banned from using the bot in this group.*${reasonText}${expiryText}`).catch(() => { });
+            }
+          }
+          return false;
+        }
+      }
+    }
+  } catch (_) { }
+
+  try {
+    if (global.GoatBot.DB && global.GoatBot.DB.userData) {
+      const user = await global.GoatBot.DB.userData.get(senderID);
+      if (user && user.isBan) {
+        if (event.type === "message" && event.body) {
+          const body = event.body.trim();
+          const prefix = typeof global.getThreadPrefix === "function"
+            ? await global.getThreadPrefix(threadID)
+            : global.GoatBot.config.prefix;
+
+          if (body.startsWith(prefix)) {
+            const message = global.buildMessage(api, event);
+            const reasonText = user.banReason ? `\n\n📋 *Reason:* ${user.banReason}` : "";
+            message.reply(`⛔ *You are banned from using the bot.*${reasonText}`).catch(() => { });
+          }
+        }
+        return false;
+      }
+    }
+  } catch (_) { }
+
+  return true;
+}
